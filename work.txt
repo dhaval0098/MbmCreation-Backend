@@ -1,0 +1,146 @@
+const multer = require("multer")
+const WorkModel = require("./model/WorkModel")
+const path  =  require("path")
+const cloudinaryUtil = require("./Utils/CloudinaryUtil")
+// const storage = multer.MulterError({ storage});
+// const upload = multer ({ storage});
+const storage =  multer.diskStorage({
+    destination:"./uploads",
+    filename: function(req,file,cb){
+        cb(null,file.originalname)
+    }
+})
+const upload =  multer({
+    storage:storage,
+}).single("image")
+
+// const additemwithfile = async(req,res)=>{
+    
+//     upload(req,res,async(err)=>{
+//         if(err){
+//             console.log(err);
+//             res.status(500).json({
+//                 message:err.message
+//             })
+//         }else{
+//             const cloudinaryResponse =  await cloudinaryUtil.uploadFileToCloudinary(req.file)
+//             console.log(cloudinaryResponse)
+//             console.log(req.body);
+
+//             req.body.imageURL = cloudinaryResponse.secure_url
+//             try{
+//             const saveditems = await (WorkModel.create(req.body))
+            
+//             console.log(saveditems)
+
+//             res.status(200).json({
+//                 message:"item saved sucessfully",
+//                 data:saveditems
+//             })
+//         }
+//         catch(err) {
+//             message: err.message
+//         }
+//         }
+//     })
+// }
+const allitems =  async(req,res)=>{
+    try{
+        const gitem = await WorkModel.find()
+        res.status(200).json({
+            message:"items fetched",
+            data:gitem
+        })
+        console.log(res.data);
+        
+
+    }catch{
+        res.status(404).json({
+            message:"error found"
+        })
+    }
+}
+
+// const additemwithfile = (req, res) => {
+//     // Declare the multer middleware here properly
+//     const uploadMultiple = upload('image', 10); // Support up to 10 images
+  
+//     uploadMultiple(req, res, async (err) => {
+//       if (err) {
+//         console.error('Multer error:', err);
+//         return res.status(500).json({ message: 'File upload failed', error: err.message });
+//       }
+  
+//       try {
+//         const { work } = req.body;
+//         const files = req.files;
+  
+//         if (!work || !files || files.length === 0) {
+//           return res.status(400).json({ message: 'Work label and at least one image required' });
+//         }
+  
+//         // Upload each file to Cloudinary
+//         const cloudinaryResults = await Promise.all(
+//           files.map(file => uploadFileToCloudinary(file))
+//         );
+  
+//         const imageURLs = cloudinaryResults.map(result => result.secure_url);
+  
+//         const savedItem = await WorkModel.create({
+//           work,
+//           imageURL: imageURLs,
+//         });
+  
+//         return res.status(200).json({
+//           message: 'Item saved successfully',
+//           data: savedItem,
+//         });
+//       } catch (error) {
+//         console.error('Upload or DB error:', error);
+//         return res.status(500).json({ message: error.message });
+//       }
+//     });
+//   };
+  const additemwithfile = (req, res) => {
+    const uploadMultiple = upload.array("image", 10); // field name 'image', max 10 files
+  
+    uploadMultiple(req, res, async (err) => {
+      if (err) {
+        console.error("Multer error:", err);
+        return res.status(500).json({ message: "File upload failed", error: err.message });
+      }
+  
+      try {
+        const { work } = req.body;
+        const files = req.files;
+  
+        if (!work || !files || files.length === 0) {
+          return res.status(400).json({ message: "Work label and at least one image required" });
+        }
+  
+        // Upload each image buffer to Cloudinary
+        const cloudinaryResults = await Promise.all(
+          files.map(file => uploadFileToCloudinary(file))
+        );
+  
+        const imageURLs = cloudinaryResults.map(result => result.secure_url);
+  
+        // Save in MongoDB
+        const savedItem = await WorkModel.create({
+          work,
+          imageURL: imageURLs,
+        });
+  
+        return res.status(200).json({
+          message: "Item saved successfully",
+          data: savedItem,
+        });
+      } catch (error) {
+        console.error("Upload or DB error:", error);
+        return res.status(500).json({ message: error.message });
+      }
+    });
+  };
+module.exports={
+    additemwithfile,allitems
+}
