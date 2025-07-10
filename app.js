@@ -16,7 +16,7 @@ app.use(WorkRoutes)
 const Queryroutes = require("./src/Controller/Routes/QueryRoutes")
 app.use(Queryroutes)
 
-mongoose.connect("mongodb://127.0.0.1:27017/mbmcreation").then(()=>{   // to connect mongodb
+mongoose.connect("mongodb+srv://dhaval0908:VtG4zppcfCxNoa6e@cluster0.ytik0gz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0").then(()=>{   // to connect mongodb
     console.log("mongodb is connected")
 })
 
