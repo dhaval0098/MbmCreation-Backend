@@ -15,6 +15,8 @@ const WorkRoutes = require("./src/Controller/Routes/WorkRoutes")
 app.use(WorkRoutes)
 const Queryroutes = require("./src/Controller/Routes/QueryRoutes")
 app.use(Queryroutes)
+const AdminRoutes = require("./src/Controller/Routes/AdminRoutes")
+app.use(AdminRoutes)
 
 mongoose.connect("mongodb+srv://dhaval0908:VtG4zppcfCxNoa6e@cluster0.ytik0gz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0").then(()=>{   // to connect mongodb
     console.log("mongodb is connected")
